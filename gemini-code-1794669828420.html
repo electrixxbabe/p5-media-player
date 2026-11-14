@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PHONOGRAPH PHANTOM // P5 Media Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #D90013;
+    --black: #0C0C0E;
+    --white: #F5F5F5;
+    --gold: #D4AF37;
+    --gray: #1E1E24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: transparent;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 8px;
+  }
+
+  .p5-deck {
+    width: 100%;
+    max-width: 480px;
+    background: var(--black);
+    border: 3px solid var(--white);
+    box-shadow: 8px 8px 0px var(--red);
+    position: relative;
+    overflow: hidden;
+    padding: 16px;
+  }
+
+  /* Diagonal Accent Stripe */
+  .p5-deck::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -40px;
+    width: 160px;
+    height: 120px;
+    background: var(--red);
+    transform: rotate(22deg);
+    z-index: 0;
+  }
+
+  .header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    background: var(--white);
+    color: var(--black);
+    font-family: 'Anton', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    padding: 2px 10px;
+    transform: skewX(-10deg);
+    border: 2px solid var(--black);
+  }
+
+  .status-tag {
+    background: var(--black);
+    color: var(--gold);
+    border: 1.5px solid var(--gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    letter-spacing: 1px;
+    transform: skewX(-10deg);
+  }
+
+  .track-display {
+    position: relative;
+    z-index: 1;
+    background: var(--gray);
+    border-left: 5px solid var(--red);
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+
+  .track-label {
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .track-title {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  /* Custom Controls (Active for YouTube) */
+  .controls {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .p5-btn {
+    flex: 1;
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    font-family: 'Anton', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    padding: 7px 0;
+    cursor: pointer;
+    transform: skewX(-10deg);
+    transition: 0.15s ease;
+  }
+
+  .p5-btn:hover {
+    background: var(--red);
+    color: var(--white);
+    border-color: var(--white);
+  }
+
+  .p5-btn.primary {
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .p5-btn.primary:hover {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  /* Media Frame Container */
+  .media-box {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    border: 2px solid var(--white);
+    background: #000;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  #yt-wrapper {
+    width: 100%;
+    height: 155px;
+  }
+
+  #spotify-wrapper {
+    display: none;
+    width: 100%;
+    height: 152px;
+  }
+
+  /* URL Loader Bar */
+  .loader-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 6px;
+  }
+
+  .loader-bar input {
+    flex: 1;
+    background: #141418;
+    border: 1.5px solid #444;
+    color: var(--white);
+    padding: 6px 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.78rem;
+  }
+
+  .loader-bar input:focus {
+    outline: none;
+    border-color: var(--red);
+  }
+
+  .load-btn {
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    font-family: 'Anton', sans-serif;
+    padding: 0 12px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="p5-deck">
+  <div class="header">
+    <div class="badge">PHONOGRAPH PHANTOM</div>
+    <div class="status-tag" id="mode-tag">LEBLANC RADIO // YT</div>
+  </div>
+
+  <div class="track-display">
+    <div class="track-label">NOW TRANSMITTING</div>
+    <div class="track-title" id="track-title">BENEATH THE MASK — RAINY MOOD</div>
+  </div>
+
+  <div class="controls" id="yt-controls">
+    <button class="p5-btn" onclick="prevTrack()">◀ PREV</button>
+    <button class="p5-btn primary" id="play-btn" onclick="togglePlay()">▶ PLAY / PAUSE</button>
+    <button class="p5-btn" onclick="nextTrack()">NEXT ▶</button>
+  </div>
+
+  <div class="media-box">
+    <div id="yt-wrapper"><div id="yt-player"></div></div>
+    <div id="spotify-wrapper"></div>
+  </div>
+
+  <div class="loader-bar">
+    <input type="text" id="url-input" placeholder="Paste Spotify playlist/track or YouTube link..." />
+    <button class="load-btn" onclick="loadCustomLink()">LOAD</button>
+  </div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  let player;
+  // Default Persona 5 Rainy Chill Mix video ID
+  let defaultVideoId = "01026128-00"; 
+  let fallbackVideoId = "hF20261114"; // Replaced below with real P5 study mix ID
+
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('yt-player', {
+      height: '155',
+      width: '100%',
+      videoId: 'w7b90928000',
+      playerVars: {
+        listType: 'playlist',
+        list: 'PLDisKgcnAC4Ros000000000000000000', // Fallback replaced on load
+        modestbranding: 1,
+        rel: 0
+      },
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    });
+    // Load a reliable Persona 5 Beneath the Mask rain ambience stream by default
+    setTimeout(() => {
+      if (player && player.loadVideoById) {
+        player.cueVideoById('gFFoxvRxLGw');
+      }
+    }, 800);
+  }
+
+  function onPlayerReady() {
+    updateTitle();
+  }
+
+  function onPlayerStateChange(event) {
+    updateTitle();
+    const playBtn = document.getElementById('play-btn');
+    if (event.data === YT.PlayerState.PLAYING) {
+      playBtn.textContent = '❚❚ PAUSE';
+    } else {
+      playBtn.textContent = '▶ PLAY';
+    }
+  }
+
+  function updateTitle() {
+    if (player && player.getVideoData) {
+      const data = player.getVideoData();
+      if (data && data.title) {
+        document.getElementById('track-title').textContent = data.title.toUpperCase();
+      }
+    }
+  }
+
+  function togglePlay() {
+    if (!player) return;
+    const state = player.getPlayerState();
+    state === YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo();
+  }
+
+  function nextTrack() { if (player && player.nextVideo) player.nextVideo(); }
+  function prevTrack() { if (player && player.previousVideo) player.previousVideo(); }
+
+  function loadCustomLink() {
+    const raw = document.getElementById('url-input').value.trim();
+    if (!raw) return;
+
+    const ytWrapper = document.getElementById('yt-wrapper');
+    const ytControls = document.getElementById('yt-controls');
+    const spWrapper = document.getElementById('spotify-wrapper');
+    const modeTag = document.getElementById('mode-tag');
+    const titleEl = document.getElementById('track-title');
+
+    // 1. Check if Spotify URL
+    if (raw.includes('open.spotify.com')) {
+      if (player && player.stopVideo) player.stopVideo();
+      ytWrapper.style.display = 'none';
+      ytControls.style.display = 'none';
+      spWrapper.style.display = 'block';
+      modeTag.textContent = 'SPOTIFY COGNITION';
+      titleEl.textContent = 'SPOTIFY STREAM ACTIVE';
+
+      // Convert open.spotify.com/playlist/XYZ -> open.spotify.com/embed/playlist/XYZ
+      const embedUrl = raw.replace('open.spotify.com/', 'open.spotify.com/embed/').split('?')[0];
+      spWrapper.innerHTML = `<iframe style="border-radius:0px" src="${embedUrl}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+      return;
+    }
+
+    // 2. Otherwise parse as YouTube Video or Playlist
+    spWrapper.style.display = 'none';
+    spWrapper.innerHTML = '';
+    ytWrapper.style.display = 'block';
+    ytControls.style.display = 'flex';
+    modeTag.textContent = 'LEBLANC RADIO // YT';
+
+    try {
+      const urlObj = new URL(raw);
+      const listId = urlObj.searchParams.get('list');
+      let videoId = urlObj.searchParams.get('v');
+      if (!videoId && urlObj.hostname === 'youtu.be') {
+        videoId = urlObj.pathname.slice(1);
+      }
+
+      if (listId) {
+        player.loadPlaylist({ list: listId, listType: 'playlist' });
+      } else if (videoId) {
+        player.loadVideoById(videoId);
+      }
+    } catch (e) {
+      alert('Please enter a valid YouTube or Spotify URL.');
+    }
+  }
+</script>
+</body>
+</html>
